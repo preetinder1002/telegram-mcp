@@ -3,7 +3,6 @@ import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/
 import { z } from 'zod';
 
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-const MCP_SECRET = process.env.MCP_SECRET;
 
 async function tg(method, params = {}) {
   const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/${method}`, {
@@ -83,13 +82,13 @@ function createServer() {
 }
 
 export default async function handler(req, res) {
-  // Auth check
-  if (MCP_SECRET) {
-    const auth = req.headers['authorization'] || '';
-    if (auth !== `Bearer ${MCP_SECRET}`) {
-      res.status(401).json({ error: 'Unauthorized' });
-      return;
-    }
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', '*');
+
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
   }
 
   if (req.method === 'GET') {
